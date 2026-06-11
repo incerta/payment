@@ -19,6 +19,7 @@ export interface ApplicationDeps {
   replayProtectionService: ReplayProtectionService;
   webhookSecret: string;
   logger: Logger;
+  enableRequestLogging?: boolean;
 }
 
 export interface BuildDepsParams {
@@ -27,6 +28,7 @@ export interface BuildDepsParams {
   timestampToleranceSec: number;
   nonceTtlSec: number;
   logger: Logger;
+  enableRequestLogging?: boolean;
 }
 
 export const buildApplicationDeps = (params: BuildDepsParams): ApplicationDeps => {
@@ -49,11 +51,22 @@ export const buildApplicationDeps = (params: BuildDepsParams): ApplicationDeps =
     replayProtectionService,
     webhookSecret: params.webhookSecret,
     logger: params.logger,
+    enableRequestLogging: params.enableRequestLogging ?? false,
   };
 };
 
 export const createApp = (deps: ApplicationDeps) => {
   const app = express();
+
+  if (deps.enableRequestLogging) {
+    app.use((req, _res, next) => {
+      deps.logger.info('Incoming request', {
+        method: req.method,
+        url: req.originalUrl,
+      });
+      next();
+    });
+  }
 
   loadGlobalMiddleware(app);
   loadRoutes(app, deps);

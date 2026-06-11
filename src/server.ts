@@ -19,12 +19,15 @@ const bootstrap = async (): Promise<void> => {
     feePercentPpm: parseFeePercentToPpm(config.defaultMerchantFeePercent),
   });
 
+  const enableRequestLogging = config.nodeEnv === 'development';
+
   const appDeps = buildApplicationDeps({
     redisClient: redis,
     webhookSecret: config.webhookSecret,
     timestampToleranceSec: config.webhookTimestampToleranceSec,
     nonceTtlSec: config.webhookNonceTtlSec,
     logger,
+    enableRequestLogging,
   });
 
   const app = createApp(appDeps);
