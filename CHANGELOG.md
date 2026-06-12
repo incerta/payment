@@ -1,3 +1,58 @@
+# 2026-06-12T07:45:11+02:00
+
+[zed agent: gpt-5.3-codex]
+
+# What changed
+
+- Added **Redis token-bucket rate limiting** (atomic Lua):
+  - `src/services/rate-limit/rate-limit.service.ts`
+  - Unit tests: `src/services/rate-limit/__tests__/rate-limit.service.test.ts`
+
+- Added reusable **route-level rate limit middleware**:
+  - `src/middleware/rate-limit/rate-limit.middleware.ts`
+
+- Wired limits in route loader:
+  - `src/loaders/routes.ts`
+  - Policies applied:
+    - `POST /invoice`: per-merchant + per-IP
+    - `GET /invoice/:id`: per-IP
+    - `POST /webhook`: per-IP
+    - invalid webhook signatures: strict per-IP limiter
+
+- Extended webhook auth middleware for invalid-signature throttling:
+  - `src/middleware/webhook-auth/webhook-auth.middleware.ts`
+
+- Updated route factories to accept rate-limit middleware:
+  - `src/api/v1/routes/invoice/invoice.route.ts`
+  - `src/api/v1/routes/webhook/webhook.route.ts`
+
+- Added config for all token-bucket policies:
+  - `src/config.ts`
+  - Env prefixes:
+    - `RATE_LIMIT_INVOICE_MERCHANT_*`
+    - `RATE_LIMIT_INVOICE_IP_*`
+    - `RATE_LIMIT_GET_INVOICE_IP_*`
+    - `RATE_LIMIT_WEBHOOK_IP_*`
+    - `RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP_*`
+  - (`*_BURST_CAPACITY`, `*_REFILL_TOKENS`, `*_REFILL_PERIOD_SEC`)
+
+- Wired deps through app bootstrap:
+  - `src/app.ts`
+  - `src/server.ts`
+  - `integration/helpers/test-context.ts`
+
+- Added `429` into API contracts/OpenAPI schemas:
+  - `src/api/v1/contracts/errors.contract.ts`
+  - `src/api/v1/contracts/invoice/create-invoice.contract.ts`
+  - `src/api/v1/contracts/invoice/get-invoice.contract.ts`
+  - `src/api/v1/contracts/webhook/process-webhook.contract.ts`
+
+- Added integration coverage for new behavior:
+  - `integration/api/v1/payment-api.integration.test.ts`
+  - tests for:
+    - merchant rate limit on invoice creation
+    - repeated invalid webhook signatures -> 429
+
 # 2026-06-12T06:15:34+02:00
 
 [human: @incerta]

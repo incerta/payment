@@ -101,6 +101,41 @@ npm start
 
 Возвращает текущий статус счёта.
 
+## Стратегия rate limiting
+
+Ограничение реализовано через **token bucket в Redis** (атомарно через Lua), поэтому корректно работает при нескольких инстансах сервиса.
+
+Где применяются лимиты:
+
+- `POST /invoice`:
+  - по `merchantId` (`invoice:create:merchant`),
+  - по IP (`invoice:create:ip`).
+- `GET /invoice/:id`:
+  - по IP (`invoice:get:ip`).
+- `POST /webhook`:
+  - по IP (`webhook:ip`).
+- невалидная подпись webhook:
+  - строгий лимит по IP (`webhook:invalid-signature:ip`).
+
+При превышении возвращается `429` (`MIDDLEWARE_ERROR`) и заголовок `Retry-After`.
+Параметры token bucket настраиваются через env:
+
+- `RATE_LIMIT_INVOICE_MERCHANT_BURST_CAPACITY`
+- `RATE_LIMIT_INVOICE_MERCHANT_REFILL_TOKENS`
+- `RATE_LIMIT_INVOICE_MERCHANT_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_INVOICE_IP_BURST_CAPACITY`
+- `RATE_LIMIT_INVOICE_IP_REFILL_TOKENS`
+- `RATE_LIMIT_INVOICE_IP_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_GET_INVOICE_IP_BURST_CAPACITY`
+- `RATE_LIMIT_GET_INVOICE_IP_REFILL_TOKENS`
+- `RATE_LIMIT_GET_INVOICE_IP_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_WEBHOOK_IP_BURST_CAPACITY`
+- `RATE_LIMIT_WEBHOOK_IP_REFILL_TOKENS`
+- `RATE_LIMIT_WEBHOOK_IP_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP_BURST_CAPACITY`
+- `RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP_REFILL_TOKENS`
+- `RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP_REFILL_PERIOD_SEC`
+
 ## Денежная точность
 
 - суммы хранятся в minor units (центах),

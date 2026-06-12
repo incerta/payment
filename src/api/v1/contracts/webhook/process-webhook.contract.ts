@@ -7,6 +7,7 @@ import {
   middlewareErrorResponseSchema,
   notFoundErrorResponseSchema,
   routeValidationErrorResponseSchema,
+  tooManyRequestsErrorResponseSchema,
   unauthorizedErrorResponseSchema,
 } from '../errors.contract'
 
@@ -40,6 +41,7 @@ export const processWebhookContract = {
     401: unauthorizedErrorResponseSchema,
     404: notFoundErrorResponseSchema,
     409: conflictErrorResponseSchema,
+    429: tooManyRequestsErrorResponseSchema,
     500: internalServerErrorResponseSchema,
   },
 } as const
@@ -109,6 +111,14 @@ export const registerProcessWebhookContract = (registry: OpenAPIRegistry): void 
         content: {
           'application/json': {
             schema: conflictErrorResponseSchema,
+          },
+        },
+      },
+      429: {
+        description: 'Rate limit exceeded',
+        content: {
+          'application/json': {
+            schema: tooManyRequestsErrorResponseSchema,
           },
         },
       },

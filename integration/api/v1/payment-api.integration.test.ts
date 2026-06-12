@@ -84,6 +84,62 @@ describe('payment API integration', () => {
     expect(response.status).toBe(401)
   })
 
+  test('POST /invoice applies merchant rate limit', async () => {
+    const calls = Array.from({ length: 25 }).map(() => {
+      return request(context.app).post('/invoice').send({
+        amount: '1.00',
+        currency: 'USD',
+        merchantId: TEST_MERCHANT_ID,
+      })
+    })
+
+    const responses = await Promise.all(calls)
+    const successful = responses.filter((response) => response.status === 201)
+    const limited = responses.filter((response) => response.status === 429)
+
+    expect(successful.length).toBeLessThanOrEqual(20)
+    expect(limited.length).toBeGreaterThanOrEqual(1)
+
+    if (limited[0]) {
+      expect(limited[0].body.error.code).toBe('MIDDLEWARE_ERROR')
+      expect(typeof limited[0].headers['retry-after']).toBe('string')
+    }
+  })
+
+  test('POST /webhook limits repeated invalid signatures', async () => {
+    const invoiceResponse = await request(context.app).post('/invoice').send({
+      amount: '10.00',
+      currency: 'USD',
+      merchantId: TEST_MERCHANT_ID,
+    })
+
+    const payload = JSON.stringify({
+      invoiceId: invoiceResponse.body.invoiceId,
+      status: 'paid',
+    })
+    const timestamp = `${Math.floor(Date.now() / 1000)}`
+
+    const attempts = Array.from({ length: 11 }).map((_, index) => {
+      return request(context.app)
+        .post('/webhook')
+        .set('Content-Type', 'application/json')
+        .set('X-Signature', 'bad-signature')
+        .set('X-Timestamp', timestamp)
+        .set('X-Nonce', `nonce-bad-signature-${index}`)
+        .send(payload)
+    })
+
+    const responses = await Promise.all(attempts)
+
+    const unauthorized = responses.filter((response) => response.status === 401)
+    const limited = responses.filter((response) => response.status === 429)
+
+    expect(unauthorized.length).toBe(10)
+    expect(limited.length).toBe(1)
+    expect(limited[0].body.error.code).toBe('MIDDLEWARE_ERROR')
+    expect(typeof limited[0].headers['retry-after']).toBe('string')
+  })
+
   test('POST /webhook paid is idempotent for repeated delivery', async () => {
     const invoiceResponse = await request(context.app).post('/invoice').send({
       amount: '10.00',

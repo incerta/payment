@@ -95,6 +95,41 @@ Generate OpenAPI spec
 npm run docs:openapi:generate
 ```
 
+## Rate limiting strategy
+
+Rate limiting is implemented as a **Redis-backed token bucket** with atomic updates (Lua), so limits are safe across multiple app instances.
+
+Applied scopes:
+
+- `POST /invoice`
+  - per merchant: `invoice:create:merchant`
+  - per IP: `invoice:create:ip`
+- `GET /invoice/:id`
+  - per IP: `invoice:get:ip`
+- `POST /webhook`
+  - per IP: `webhook:ip`
+- invalid webhook signature attempts (`X-Signature` mismatch)
+  - strict per IP limiter: `webhook:invalid-signature:ip`
+
+When a limit is exceeded, the API returns `429` (`MIDDLEWARE_ERROR`) and sets `Retry-After`.
+All token bucket parameters are configurable via env:
+
+- `RATE_LIMIT_INVOICE_MERCHANT_BURST_CAPACITY`
+- `RATE_LIMIT_INVOICE_MERCHANT_REFILL_TOKENS`
+- `RATE_LIMIT_INVOICE_MERCHANT_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_INVOICE_IP_BURST_CAPACITY`
+- `RATE_LIMIT_INVOICE_IP_REFILL_TOKENS`
+- `RATE_LIMIT_INVOICE_IP_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_GET_INVOICE_IP_BURST_CAPACITY`
+- `RATE_LIMIT_GET_INVOICE_IP_REFILL_TOKENS`
+- `RATE_LIMIT_GET_INVOICE_IP_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_WEBHOOK_IP_BURST_CAPACITY`
+- `RATE_LIMIT_WEBHOOK_IP_REFILL_TOKENS`
+- `RATE_LIMIT_WEBHOOK_IP_REFILL_PERIOD_SEC`
+- `RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP_BURST_CAPACITY`
+- `RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP_REFILL_TOKENS`
+- `RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP_REFILL_PERIOD_SEC`
+
 ## API version (`/v1`, `/v2`, ...)
 
 Bumped only on a **public contract break** — any change that can cause a compliant client to fail:

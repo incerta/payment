@@ -50,6 +50,7 @@ export const unauthorizedErrorResponseSchema = z.union([
 
 export const conflictErrorResponseSchema = serviceErrorResponseSchema
 export const notFoundErrorResponseSchema = serviceErrorResponseSchema
+export const tooManyRequestsErrorResponseSchema = middlewareErrorResponseSchema
 
 export const internalServerErrorResponseSchema = z.union([
   internalErrorResponseSchema,
@@ -69,5 +70,6 @@ export const registerErrorSchemas = (registry: OpenAPIRegistry): void => {
   registry.register('UnauthorizedErrorResponse', unauthorizedErrorResponseSchema)
   registry.register('ConflictErrorResponse', conflictErrorResponseSchema)
   registry.register('NotFoundErrorResponse', notFoundErrorResponseSchema)
+  registry.register('TooManyRequestsErrorResponse', tooManyRequestsErrorResponseSchema)
   registry.register('InternalServerErrorResponse', internalServerErrorResponseSchema)
 }

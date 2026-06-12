@@ -41,6 +41,33 @@ export const createIntegrationTestContext = async (): Promise<IntegrationTestCon
     webhookSecret: TEST_WEBHOOK_SECRET,
     timestampToleranceSec: 300,
     nonceTtlSec: 300,
+    rateLimitPolicies: {
+      createInvoicePerMerchant: {
+        capacity: 20,
+        refillTokens: 60,
+        refillPeriodSec: 60,
+      },
+      createInvoicePerIp: {
+        capacity: 40,
+        refillTokens: 120,
+        refillPeriodSec: 60,
+      },
+      getInvoicePerIp: {
+        capacity: 40,
+        refillTokens: 120,
+        refillPeriodSec: 60,
+      },
+      webhookPerIp: {
+        capacity: 100,
+        refillTokens: 300,
+        refillPeriodSec: 60,
+      },
+      webhookInvalidSignaturePerIp: {
+        capacity: 10,
+        refillTokens: 10,
+        refillPeriodSec: 60,
+      },
+    },
     logger: buildLogger(),
   })
 

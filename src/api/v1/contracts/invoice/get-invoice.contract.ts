@@ -4,6 +4,7 @@ import {
   internalServerErrorResponseSchema,
   notFoundErrorResponseSchema,
   routeValidationErrorResponseSchema,
+  tooManyRequestsErrorResponseSchema,
 } from '../errors.contract'
 
 export const getInvoiceContract = {
@@ -19,6 +20,7 @@ export const getInvoiceContract = {
     200: getInvoiceResponseSchema,
     400: routeValidationErrorResponseSchema,
     404: notFoundErrorResponseSchema,
+    429: tooManyRequestsErrorResponseSchema,
     500: internalServerErrorResponseSchema,
   },
 } as const
@@ -58,6 +60,14 @@ export const registerGetInvoiceContract = (registry: OpenAPIRegistry): void => {
         content: {
           'application/json': {
             schema: notFoundErrorResponseSchema,
+          },
+        },
+      },
+      429: {
+        description: 'Rate limit exceeded',
+        content: {
+          'application/json': {
+            schema: tooManyRequestsErrorResponseSchema,
           },
         },
       },

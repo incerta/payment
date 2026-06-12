@@ -5,13 +5,14 @@ import { BaseError } from './core/error'
 import { InvoiceRepository } from './models/invoice/invoice.repository'
 import { MerchantRepository } from './models/merchant/merchant.repository'
 import { loadGlobalMiddleware } from './loaders/global-middleware'
-import { loadRoutes } from './loaders/routes'
+import { loadRoutes, type RateLimitPolicies } from './loaders/routes'
 import { loadOpenApiDocs } from './loaders/openapi'
 import { InvoiceService } from './services/invoice/invoice.service'
 import {
   ReplayProtectionService,
   RedisNonceStore,
 } from './services/replay-protection/replay-protection.service'
+import { RateLimitService, RedisTokenBucketStore } from './services/rate-limit/rate-limit.service'
 import { WebhookService } from './services/webhook/webhook.service'
 
 export interface ApplicationDeps {
@@ -19,6 +20,8 @@ export interface ApplicationDeps {
   webhookService: WebhookService
   replayProtectionService: ReplayProtectionService
   webhookSecret: string
+  rateLimitService: RateLimitService
+  rateLimitPolicies: RateLimitPolicies
   logger: Logger
   enableRequestLogging?: boolean
 }
@@ -28,6 +31,7 @@ export interface BuildDepsParams {
   webhookSecret: string
   timestampToleranceSec: number
   nonceTtlSec: number
+  rateLimitPolicies: RateLimitPolicies
   logger: Logger
   enableRequestLogging?: boolean
 }
@@ -46,11 +50,16 @@ export const buildApplicationDeps = (params: BuildDepsParams): ApplicationDeps =
     params.nonceTtlSec,
   )
 
+  const tokenBucketStore = new RedisTokenBucketStore(params.redisClient)
+  const rateLimitService = new RateLimitService(tokenBucketStore)
+
   return {
     invoiceService,
     webhookService,
     replayProtectionService,
     webhookSecret: params.webhookSecret,
+    rateLimitService,
+    rateLimitPolicies: params.rateLimitPolicies,
     logger: params.logger,
     enableRequestLogging: params.enableRequestLogging ?? false,
   }

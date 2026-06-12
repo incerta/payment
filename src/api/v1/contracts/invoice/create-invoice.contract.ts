@@ -9,6 +9,7 @@ import {
   notFoundErrorResponseSchema,
   routeValidationErrorResponseSchema,
   serviceErrorResponseSchema,
+  tooManyRequestsErrorResponseSchema,
 } from '../errors.contract'
 
 const createInvoiceBadRequestErrorResponseSchema = z.union([
@@ -29,6 +30,7 @@ export const createInvoiceContract = {
     201: createInvoiceResponseSchema,
     400: createInvoiceBadRequestErrorResponseSchema,
     404: notFoundErrorResponseSchema,
+    429: tooManyRequestsErrorResponseSchema,
     500: internalServerErrorResponseSchema,
   },
 } as const
@@ -85,6 +87,14 @@ export const registerCreateInvoiceContract = (registry: OpenAPIRegistry): void =
         content: {
           'application/json': {
             schema: notFoundErrorResponseSchema,
+          },
+        },
+      },
+      429: {
+        description: 'Rate limit exceeded',
+        content: {
+          'application/json': {
+            schema: tooManyRequestsErrorResponseSchema,
           },
         },
       },

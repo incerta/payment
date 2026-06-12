@@ -1,18 +1,27 @@
 import type { RequestHandler } from 'express'
 import { BaseError, MiddlewareError } from '../../core/error'
 import { ReplayProtectionService } from '../../services/replay-protection/replay-protection.service'
+import {
+  RateLimitService,
+  type TokenBucketPolicy,
+} from '../../services/rate-limit/rate-limit.service'
 import { verifyHmacSha256Signature } from '../../services/security/hmac.service'
 
 export interface WebhookAuthMiddlewareDeps {
   webhookSecret: string
   replayProtectionService: ReplayProtectionService
+  invalidSignatureRateLimit?: {
+    rateLimitService: RateLimitService
+    policy: TokenBucketPolicy
+  }
 }
 
 export const createWebhookAuthMiddleware = ({
   webhookSecret,
   replayProtectionService,
+  invalidSignatureRateLimit,
 }: WebhookAuthMiddlewareDeps): RequestHandler => {
-  return async (req, _res, next) => {
+  return async (req, res, next) => {
     try {
       const signature = req.header('X-Signature')
       const timestamp = req.header('X-Timestamp')
@@ -43,6 +52,26 @@ export const createWebhookAuthMiddleware = ({
       })
 
       if (!isSignatureValid) {
+        if (invalidSignatureRateLimit) {
+          const rateLimitResult = await invalidSignatureRateLimit.rateLimitService.check({
+            scope: 'webhook:invalid-signature:ip',
+            identifier: req.ip ?? 'unknown',
+            policy: invalidSignatureRateLimit.policy,
+          })
+
+          if (!rateLimitResult.allowed) {
+            res.setHeader('Retry-After', `${rateLimitResult.retryAfterSec}`)
+
+            throw new MiddlewareError('Too many invalid webhook signatures', {
+              statusCode: 429,
+              details: {
+                scope: 'webhook:invalid-signature:ip',
+                retryAfterSec: rateLimitResult.retryAfterSec,
+              },
+            })
+          }
+        }
+
         throw new MiddlewareError('Invalid webhook signature', { statusCode: 401 })
       }
 

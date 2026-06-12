@@ -26,6 +26,7 @@ const bootstrap = async (): Promise<void> => {
     webhookSecret: config.webhookSecret,
     timestampToleranceSec: config.webhookTimestampToleranceSec,
     nonceTtlSec: config.webhookNonceTtlSec,
+    rateLimitPolicies: config.rateLimitPolicies,
     logger,
     enableRequestLogging,
   })

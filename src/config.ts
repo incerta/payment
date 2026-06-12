@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import { resolve } from 'node:path'
+import type { TokenBucketPolicy } from './services/rate-limit/rate-limit.service'
 
 export const OPEN_API_DOCS_PATH = resolve(process.cwd(), 'storage/docs/openapi.json')
 
@@ -28,6 +29,63 @@ const parseStringEnv = (name: string, defaultValue: string): string => {
   return raw.trim()
 }
 
+const parseTokenBucketPolicyEnv = ({
+  envKeyPrefix,
+  defaults,
+}: {
+  envKeyPrefix: string
+  defaults: TokenBucketPolicy
+}): TokenBucketPolicy => {
+  return {
+    capacity: parseNumberEnv(`${envKeyPrefix}_BURST_CAPACITY`, defaults.capacity),
+    refillTokens: parseNumberEnv(`${envKeyPrefix}_REFILL_TOKENS`, defaults.refillTokens),
+    refillPeriodSec: parseNumberEnv(`${envKeyPrefix}_REFILL_PERIOD_SEC`, defaults.refillPeriodSec),
+  }
+}
+
+const rateLimitPolicies = {
+  createInvoicePerMerchant: parseTokenBucketPolicyEnv({
+    envKeyPrefix: 'RATE_LIMIT_INVOICE_MERCHANT',
+    defaults: {
+      capacity: 20,
+      refillTokens: 60,
+      refillPeriodSec: 60,
+    },
+  }),
+  createInvoicePerIp: parseTokenBucketPolicyEnv({
+    envKeyPrefix: 'RATE_LIMIT_INVOICE_IP',
+    defaults: {
+      capacity: 40,
+      refillTokens: 120,
+      refillPeriodSec: 60,
+    },
+  }),
+  getInvoicePerIp: parseTokenBucketPolicyEnv({
+    envKeyPrefix: 'RATE_LIMIT_GET_INVOICE_IP',
+    defaults: {
+      capacity: 40,
+      refillTokens: 120,
+      refillPeriodSec: 60,
+    },
+  }),
+  webhookPerIp: parseTokenBucketPolicyEnv({
+    envKeyPrefix: 'RATE_LIMIT_WEBHOOK_IP',
+    defaults: {
+      capacity: 100,
+      refillTokens: 300,
+      refillPeriodSec: 60,
+    },
+  }),
+  webhookInvalidSignaturePerIp: parseTokenBucketPolicyEnv({
+    envKeyPrefix: 'RATE_LIMIT_WEBHOOK_INVALID_SIGNATURE_IP',
+    defaults: {
+      capacity: 10,
+      refillTokens: 10,
+      refillPeriodSec: 60,
+    },
+  }),
+}
+
 export const config = {
   nodeEnv: parseStringEnv('NODE_ENV', 'development'),
   port: parseNumberEnv('PORT', 3000),
@@ -38,4 +96,5 @@ export const config = {
   webhookNonceTtlSec: parseNumberEnv('WEBHOOK_NONCE_TTL_SEC', 300),
   defaultMerchantId: parseStringEnv('DEFAULT_MERCHANT_ID', 'merchant-demo'),
   defaultMerchantFeePercent: parseStringEnv('DEFAULT_MERCHANT_FEE_PERCENT', '0.029'),
+  rateLimitPolicies,
 }
