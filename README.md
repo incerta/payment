@@ -28,28 +28,44 @@ npm run test:unit
 npm run test:integration
 ```
 
+Generate OpenAPI spec
+
+```sh
+npm run docs:openapi:generate
+```
+
 # App structure
 
-The app is organized into four layers, each with a single responsibility.
-Import direction is strictly top-down — upper layers call lower ones; lower layers never import from above.
+The app uses strict boundary layering with a single source of truth for HTTP behavior.
+
+**Hierarchy (strict):** `contract <- route <- controller <- service <- model`
 
 API (`/api/v1`) is the HTTP boundary.
 
-- **Routes** – bind middleware and controllers to paths
-- **DTO** (`src/api/v1/dto`) – request/response Zod schemas (with property constraints)
-- **Controllers** – parse request DTO, call services, map and (dev/test-only) validate response DTO
+- **Contracts** (`src/api/v1/contracts`) – top-level HTTP contract entity (request/response/error schemas + operation metadata)
+- **Routes** – bind contract validators, middleware and controllers to paths
+- **DTO** (`src/api/v1/dto`) – reusable Zod schema primitives for contracts/controllers mapping
+- **Controllers** – orchestration only: call services, map domain to response payload
 - **Middleware** (`src/middleware`) – authentication & security, independent from API versioning
 - **Services** – business logic
 - **Models** – persistence
 
-> Import direction: [routes <- controllers <- services <- models], and [routes <- middleware].
+> Import direction is strict: `contract <- route <- controller <- service <- model`; middleware is attached at route level.
 
-Response contract validation is enabled only when `NODE_ENV !== 'production'`.
+Validation is route-level only:
+
+- Request validation (`body/params/query`) is executed by contract-driven route validators.
+- Response validation is executed by contract-driven route validator middleware and enabled only when `NODE_ENV !== 'production'`.
+
+Swagger UI is served at `/docs`, raw OpenAPI JSON at `/openapi.json`.
 
 ```
 |-- src
 |   |-- api
 |   |   |-- v1
+|   |   |   |-- contracts
+|   |   |   |   |-- <contract_name>
+|   |   |   |   |   |-- <contract_name>.contract.ts
 |   |   |   |-- routes
 |   |   |   |   |-- <route_name>
 |   |   |   |   |   |-- <route_name>.route.ts
@@ -68,7 +84,7 @@ Response contract validation is enabled only when `NODE_ENV !== 'production'`.
 |   |-- models
 |   |-- core
 |   |   |-- error.ts
-|   |   |-- route-deprecate-middleware.ts
+|   |   |-- http-contract.ts
 |   |-- loaders
 |   |-- config.ts
 |   |-- app.ts

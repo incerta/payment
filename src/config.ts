@@ -1,4 +1,7 @@
 import dotenv from 'dotenv';
+import { resolve } from 'node:path';
+
+export const OPEN_API_DOCS_PATH = resolve(process.cwd(), 'storage/docs/openapi.json');
 
 dotenv.config();
 

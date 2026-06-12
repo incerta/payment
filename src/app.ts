@@ -6,6 +6,7 @@ import { InvoiceRepository } from './models/invoice/invoice.repository';
 import { MerchantRepository } from './models/merchant/merchant.repository';
 import { loadGlobalMiddleware } from './loaders/global-middleware';
 import { loadRoutes } from './loaders/routes';
+import { loadOpenApiDocs } from './loaders/openapi';
 import { InvoiceService } from './services/invoice/invoice.service';
 import {
   ReplayProtectionService,
@@ -70,6 +71,7 @@ export const createApp = (deps: ApplicationDeps) => {
 
   loadGlobalMiddleware(app);
   loadRoutes(app, deps);
+  loadOpenApiDocs(app);
 
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     if (error instanceof BaseError) {

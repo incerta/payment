@@ -16,7 +16,7 @@ describe('validateRouteOutput', () => {
     process.env.NODE_ENV = 'development';
     jest.resetModules();
 
-    const { validateRouteOutput } = await import('../route-deprecate-middleware');
+    const { validateRouteOutput } = await import('../http-contract');
 
     expect(() =>
       validateRouteOutput(responseSchema, { invoiceId: 'not-an-object-id' }, 'GET /invoice/:id'),
@@ -27,10 +27,12 @@ describe('validateRouteOutput', () => {
     process.env.NODE_ENV = 'production';
     jest.resetModules();
 
-    const { validateRouteOutput } = await import('../route-deprecate-middleware');
+    const { validateRouteOutput } = await import('../http-contract');
 
     const invalidPayload = { invoiceId: 'not-an-object-id' };
 
-    expect(validateRouteOutput(responseSchema, invalidPayload, 'GET /invoice/:id')).toEqual(invalidPayload);
+    expect(validateRouteOutput(responseSchema, invalidPayload, 'GET /invoice/:id')).toEqual(
+      invalidPayload,
+    );
   });
 });

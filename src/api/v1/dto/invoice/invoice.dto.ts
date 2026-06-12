@@ -1,5 +1,4 @@
-import { RouteError } from '../../../../core/error';
-import { z, type ZodError } from 'zod';
+import { z } from 'zod';
 
 const OBJECT_ID_REGEX = /^[a-f\d]{24}$/i;
 const REQUEST_AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
@@ -19,15 +18,6 @@ const responseCurrencySchema = z
   .regex(/^[A-Z]{3}$/);
 const responseAmountSchema = z.string().trim().min(4).max(32).regex(RESPONSE_AMOUNT_REGEX);
 
-const mapZodToRouteError = (error: ZodError, message: string): RouteError => {
-  return new RouteError(message, {
-    statusCode: 400,
-    details: {
-      issues: error.issues,
-    },
-  });
-};
-
 export const createInvoiceRequestSchema = z.object({
   amount: z.union([
     z.string().trim().min(1).max(32).regex(REQUEST_AMOUNT_REGEX),
@@ -46,6 +36,10 @@ export const createInvoiceResponseSchema = z.object({
   amountToReceive: responseAmountSchema,
 });
 
+export const getInvoiceParamsSchema = z.object({
+  id: invoiceIdSchema,
+});
+
 export const getInvoiceResponseSchema = z.object({
   invoiceId: invoiceIdSchema,
   status: z.enum(['pending', 'paid', 'failed']),
@@ -58,22 +52,5 @@ export const getInvoiceResponseSchema = z.object({
 
 export type CreateInvoiceRequestDto = z.infer<typeof createInvoiceRequestSchema>;
 export type CreateInvoiceResponseDto = z.infer<typeof createInvoiceResponseSchema>;
+export type GetInvoiceParamsDto = z.infer<typeof getInvoiceParamsSchema>;
 export type GetInvoiceResponseDto = z.infer<typeof getInvoiceResponseSchema>;
-
-export const parseCreateInvoiceRequest = (body: unknown): CreateInvoiceRequestDto => {
-  const validationResult = createInvoiceRequestSchema.safeParse(body);
-  if (validationResult.success) {
-    return validationResult.data;
-  }
-
-  throw mapZodToRouteError(validationResult.error, 'Invalid create invoice request payload');
-};
-
-export const parseInvoiceIdParam = (value: unknown): string => {
-  const validationResult = invoiceIdSchema.safeParse(value);
-  if (validationResult.success) {
-    return validationResult.data;
-  }
-
-  throw mapZodToRouteError(validationResult.error, 'Invalid invoice id route param');
-};
