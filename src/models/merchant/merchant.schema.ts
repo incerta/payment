@@ -1,10 +1,10 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose'
 
 interface MerchantSchemaType {
-  merchantId: string;
-  feePercentPpm: number;
-  createdAt: Date;
-  updatedAt: Date;
+  merchantId: string
+  feePercentPpm: number
+  createdAt: Date
+  updatedAt: Date
 }
 
 const merchantSchema = new Schema<MerchantSchemaType>(
@@ -27,6 +27,6 @@ const merchantSchema = new Schema<MerchantSchemaType>(
     timestamps: true,
     versionKey: false,
   },
-);
+)
 
-export const MerchantModel = model<MerchantSchemaType>('Merchant', merchantSchema);
+export const MerchantModel = model<MerchantSchemaType>('Merchant', merchantSchema)

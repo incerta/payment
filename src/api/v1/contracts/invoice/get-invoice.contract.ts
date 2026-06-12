@@ -1,10 +1,10 @@
-import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import { getInvoiceParamsSchema, getInvoiceResponseSchema } from '../../dto/invoice/invoice.dto';
+import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi'
+import { getInvoiceParamsSchema, getInvoiceResponseSchema } from '../../dto/invoice/invoice.dto'
 import {
   internalServerErrorResponseSchema,
   notFoundErrorResponseSchema,
   routeValidationErrorResponseSchema,
-} from '../errors.contract';
+} from '../errors.contract'
 
 export const getInvoiceContract = {
   method: 'get',
@@ -21,11 +21,11 @@ export const getInvoiceContract = {
     404: notFoundErrorResponseSchema,
     500: internalServerErrorResponseSchema,
   },
-} as const;
+} as const
 
 export const registerGetInvoiceContract = (registry: OpenAPIRegistry): void => {
-  const getInvoiceParams = registry.register('GetInvoiceParams', getInvoiceParamsSchema);
-  const getInvoiceResponse = registry.register('GetInvoiceResponse', getInvoiceResponseSchema);
+  const getInvoiceParams = registry.register('GetInvoiceParams', getInvoiceParamsSchema)
+  const getInvoiceResponse = registry.register('GetInvoiceResponse', getInvoiceResponseSchema)
 
   registry.registerPath({
     method: getInvoiceContract.method,
@@ -70,5 +70,5 @@ export const registerGetInvoiceContract = (registry: OpenAPIRegistry): void => {
         },
       },
     },
-  });
-};
+  })
+}

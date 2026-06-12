@@ -1,6 +1,6 @@
-import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import { z } from 'zod';
-import { webhookRequestSchema, webhookResponseSchema } from '../../dto/webhook/webhook.dto';
+import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi'
+import { z } from 'zod'
+import { webhookRequestSchema, webhookResponseSchema } from '../../dto/webhook/webhook.dto'
 import {
   conflictErrorResponseSchema,
   internalServerErrorResponseSchema,
@@ -8,18 +8,18 @@ import {
   notFoundErrorResponseSchema,
   routeValidationErrorResponseSchema,
   unauthorizedErrorResponseSchema,
-} from '../errors.contract';
+} from '../errors.contract'
 
 const webhookHeadersSchema = z.object({
   'x-signature': z.string().min(1),
   'x-timestamp': z.string().min(1),
   'x-nonce': z.string().min(1),
-});
+})
 
 const processWebhookBadRequestErrorResponseSchema = z.union([
   routeValidationErrorResponseSchema,
   middlewareErrorResponseSchema,
-]);
+])
 
 export const processWebhookContract = {
   method: 'post',
@@ -39,16 +39,16 @@ export const processWebhookContract = {
     409: conflictErrorResponseSchema,
     500: internalServerErrorResponseSchema,
   },
-} as const;
+} as const
 
 export const registerProcessWebhookContract = (registry: OpenAPIRegistry): void => {
-  const processWebhookRequest = registry.register('ProcessWebhookRequest', webhookRequestSchema);
-  const processWebhookResponse = registry.register('ProcessWebhookResponse', webhookResponseSchema);
-  const webhookHeaders = registry.register('WebhookHeaders', webhookHeadersSchema);
+  const processWebhookRequest = registry.register('ProcessWebhookRequest', webhookRequestSchema)
+  const processWebhookResponse = registry.register('ProcessWebhookResponse', webhookResponseSchema)
+  const webhookHeaders = registry.register('WebhookHeaders', webhookHeadersSchema)
   const processWebhookBadRequest = registry.register(
     'ProcessWebhookBadRequestErrorResponse',
     processWebhookBadRequestErrorResponseSchema,
-  );
+  )
 
   registry.registerPath({
     method: processWebhookContract.method,
@@ -118,5 +118,5 @@ export const registerProcessWebhookContract = (registry: OpenAPIRegistry): void 
         },
       },
     },
-  });
-};
+  })
+}

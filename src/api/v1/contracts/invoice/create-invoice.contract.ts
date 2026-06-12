@@ -1,20 +1,20 @@
-import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import { z } from 'zod';
+import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi'
+import { z } from 'zod'
 import {
   createInvoiceRequestSchema,
   createInvoiceResponseSchema,
-} from '../../dto/invoice/invoice.dto';
+} from '../../dto/invoice/invoice.dto'
 import {
   internalServerErrorResponseSchema,
   notFoundErrorResponseSchema,
   routeValidationErrorResponseSchema,
   serviceErrorResponseSchema,
-} from '../errors.contract';
+} from '../errors.contract'
 
 const createInvoiceBadRequestErrorResponseSchema = z.union([
   routeValidationErrorResponseSchema,
   serviceErrorResponseSchema,
-]);
+])
 
 export const createInvoiceContract = {
   method: 'post',
@@ -31,23 +31,20 @@ export const createInvoiceContract = {
     404: notFoundErrorResponseSchema,
     500: internalServerErrorResponseSchema,
   },
-} as const;
+} as const
 
-export type CreateInvoiceRequestContractBody = z.infer<typeof createInvoiceRequestSchema>;
+export type CreateInvoiceRequestContractBody = z.infer<typeof createInvoiceRequestSchema>
 
 export const registerCreateInvoiceContract = (registry: OpenAPIRegistry): void => {
-  const createInvoiceRequest = registry.register(
-    'CreateInvoiceRequest',
-    createInvoiceRequestSchema,
-  );
+  const createInvoiceRequest = registry.register('CreateInvoiceRequest', createInvoiceRequestSchema)
   const createInvoiceResponse = registry.register(
     'CreateInvoiceResponse',
     createInvoiceResponseSchema,
-  );
+  )
   const createInvoiceBadRequest = registry.register(
     'CreateInvoiceBadRequestErrorResponse',
     createInvoiceBadRequestErrorResponseSchema,
-  );
+  )
 
   registry.registerPath({
     method: createInvoiceContract.method,
@@ -100,5 +97,5 @@ export const registerCreateInvoiceContract = (registry: OpenAPIRegistry): void =
         },
       },
     },
-  });
-};
+  })
+}

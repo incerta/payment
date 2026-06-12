@@ -1,6 +1,6 @@
-import { formatMinorToAmount } from '../../../../utils/money';
-import type { InvoiceModel } from '../../../../models/invoice/invoice.types';
-import type { GetInvoiceResponseDto } from '../../dto/invoice/invoice.dto';
+import { formatMinorToAmount } from '../../../../utils/money'
+import type { InvoiceModel } from '../../../../models/invoice/invoice.types'
+import type { GetInvoiceResponseDto } from '../../dto/invoice/invoice.dto'
 
 export const mapInvoiceToGetResponse = (invoice: InvoiceModel): GetInvoiceResponseDto => {
   return {
@@ -11,5 +11,5 @@ export const mapInvoiceToGetResponse = (invoice: InvoiceModel): GetInvoiceRespon
     fee: formatMinorToAmount(invoice.feeMinor),
     amountToReceive: formatMinorToAmount(invoice.amountToReceiveMinor),
     credited: invoice.creditCount > 0,
-  };
-};
+  }
+}

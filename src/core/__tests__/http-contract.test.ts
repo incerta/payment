@@ -1,38 +1,38 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 const responseSchema = z.object({
   invoiceId: z.string().length(24),
-});
+})
 
 describe('validateRouteOutput', () => {
-  const initialNodeEnv = process.env.NODE_ENV;
+  const initialNodeEnv = process.env.NODE_ENV
 
   afterEach(() => {
-    process.env.NODE_ENV = initialNodeEnv;
-    jest.resetModules();
-  });
+    process.env.NODE_ENV = initialNodeEnv
+    jest.resetModules()
+  })
 
   test('validates response schema when NODE_ENV is not production', async () => {
-    process.env.NODE_ENV = 'development';
-    jest.resetModules();
+    process.env.NODE_ENV = 'development'
+    jest.resetModules()
 
-    const { validateRouteOutput } = await import('../http-contract');
+    const { validateRouteOutput } = await import('../http-contract')
 
     expect(() =>
       validateRouteOutput(responseSchema, { invoiceId: 'not-an-object-id' }, 'GET /invoice/:id'),
-    ).toThrow('Invalid response payload for GET /invoice/:id');
-  });
+    ).toThrow('Invalid response payload for GET /invoice/:id')
+  })
 
   test('skips response validation in production', async () => {
-    process.env.NODE_ENV = 'production';
-    jest.resetModules();
+    process.env.NODE_ENV = 'production'
+    jest.resetModules()
 
-    const { validateRouteOutput } = await import('../http-contract');
+    const { validateRouteOutput } = await import('../http-contract')
 
-    const invalidPayload = { invoiceId: 'not-an-object-id' };
+    const invalidPayload = { invoiceId: 'not-an-object-id' }
 
     expect(validateRouteOutput(responseSchema, invalidPayload, 'GET /invoice/:id')).toEqual(
       invalidPayload,
-    );
-  });
-});
+    )
+  })
+})

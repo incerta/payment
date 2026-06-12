@@ -6,4 +6,4 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.test.ts', '**/*.integration.test.ts'],
   clearMocks: true,
   moduleFileExtensions: ['ts', 'js', 'json'],
-};
+}

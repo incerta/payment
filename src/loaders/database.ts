@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 export const connectDatabase = async (uri: string): Promise<void> => {
-  await mongoose.connect(uri);
-};
+  await mongoose.connect(uri)
+}
 
 export const disconnectDatabase = async (): Promise<void> => {
-  await mongoose.disconnect();
-};
+  await mongoose.disconnect()
+}

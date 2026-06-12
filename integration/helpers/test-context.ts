@@ -1,40 +1,40 @@
-import type { Express } from 'express';
-import Redis from 'ioredis';
-import IORedisMock from 'ioredis-mock';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { buildApplicationDeps, createApp } from '../../src/app';
-import { connectDatabase, disconnectDatabase } from '../../src/loaders/database';
-import { buildLogger } from '../../src/loaders/logger';
-import { InvoiceModel } from '../../src/models/invoice/invoice.schema';
-import { MerchantRepository } from '../../src/models/merchant/merchant.repository';
-import { parseFeePercentToPpm } from '../../src/utils/money';
+import type { Express } from 'express'
+import Redis from 'ioredis'
+import IORedisMock from 'ioredis-mock'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { buildApplicationDeps, createApp } from '../../src/app'
+import { connectDatabase, disconnectDatabase } from '../../src/loaders/database'
+import { buildLogger } from '../../src/loaders/logger'
+import { InvoiceModel } from '../../src/models/invoice/invoice.schema'
+import { MerchantRepository } from '../../src/models/merchant/merchant.repository'
+import { parseFeePercentToPpm } from '../../src/utils/money'
 
-export const TEST_WEBHOOK_SECRET = 'integration-secret';
-export const TEST_MERCHANT_ID = 'merchant-it';
+export const TEST_WEBHOOK_SECRET = 'integration-secret'
+export const TEST_MERCHANT_ID = 'merchant-it'
 
 interface RedisLike {
-  flushall: () => Promise<unknown>;
-  quit: () => Promise<unknown>;
+  flushall: () => Promise<unknown>
+  quit: () => Promise<unknown>
 }
 
 export interface IntegrationTestContext {
-  app: Express;
-  mongo: MongoMemoryServer;
-  redis: RedisLike;
-  cleanup: () => Promise<void>;
+  app: Express
+  mongo: MongoMemoryServer
+  redis: RedisLike
+  cleanup: () => Promise<void>
 }
 
 export const createIntegrationTestContext = async (): Promise<IntegrationTestContext> => {
-  const mongo = await MongoMemoryServer.create();
-  await connectDatabase(mongo.getUri());
+  const mongo = await MongoMemoryServer.create()
+  await connectDatabase(mongo.getUri())
 
-  const redis = new IORedisMock();
+  const redis = new IORedisMock()
 
-  const merchantRepository = new MerchantRepository();
+  const merchantRepository = new MerchantRepository()
   await merchantRepository.upsert({
     merchantId: TEST_MERCHANT_ID,
     feePercentPpm: parseFeePercentToPpm('0.029'),
-  });
+  })
 
   const deps = buildApplicationDeps({
     redisClient: redis as unknown as Redis,
@@ -42,19 +42,19 @@ export const createIntegrationTestContext = async (): Promise<IntegrationTestCon
     timestampToleranceSec: 300,
     nonceTtlSec: 300,
     logger: buildLogger(),
-  });
+  })
 
-  const app = createApp(deps);
+  const app = createApp(deps)
 
   return {
     app,
     mongo,
     redis,
     cleanup: async () => {
-      await InvoiceModel.deleteMany({});
-      await redis.quit();
-      await disconnectDatabase();
-      await mongo.stop();
+      await InvoiceModel.deleteMany({})
+      await redis.quit()
+      await disconnectDatabase()
+      await mongo.stop()
     },
-  };
-};
+  }
+}

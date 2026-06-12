@@ -1,17 +1,17 @@
-import { Schema, model } from 'mongoose';
-import type { InvoiceStatus } from './invoice.types';
+import { Schema, model } from 'mongoose'
+import type { InvoiceStatus } from './invoice.types'
 
 interface InvoiceSchemaType {
-  merchantId: string;
-  currency: string;
-  amountMinor: number;
-  feeMinor: number;
-  amountToReceiveMinor: number;
-  status: InvoiceStatus;
-  creditCount: number;
-  creditedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  merchantId: string
+  currency: string
+  amountMinor: number
+  feeMinor: number
+  amountToReceiveMinor: number
+  status: InvoiceStatus
+  creditCount: number
+  creditedAt: Date | null
+  createdAt: Date
+  updatedAt: Date
 }
 
 const invoiceSchema = new Schema<InvoiceSchemaType>(
@@ -66,6 +66,6 @@ const invoiceSchema = new Schema<InvoiceSchemaType>(
     timestamps: true,
     versionKey: false,
   },
-);
+)
 
-export const InvoiceModel = model<InvoiceSchemaType>('Invoice', invoiceSchema);
+export const InvoiceModel = model<InvoiceSchemaType>('Invoice', invoiceSchema)
