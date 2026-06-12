@@ -13,6 +13,6 @@
     "types": ["node", "jest"],
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src", "integration", "jest.config.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": ["src", "jest.config.ts"],
+  "exclude": ["dist", "node_modules", "integration", "scripts"]
 }
