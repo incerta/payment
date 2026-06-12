@@ -76,16 +76,20 @@ Swagger UI is served at `/docs`, raw OpenAPI JSON at `/openapi.json`.
 |   |   |   |   |-- <controller_name>
 |   |   |   |   |   |-- <controller_name>.controller.ts
 |   |   |   |   |   |-- <controller_name>.<?action>.mappers.ts
-|   |   |   |-- fixtures
 |   |-- middleware
 |   |   |-- <middleware_name>
 |   |   |   |-- <middleware_name>.middleware.ts
 |   |-- services
+|   |   |-- <service_name>
+|   |   |   |-- <service_name>.service.ts
 |   |-- models
+|   |   |-- <service_name>
+|   |   |   |-- <service_name>.service.ts
 |   |-- core
 |   |   |-- error.ts
 |   |   |-- http-contract.ts
 |   |-- loaders
+|   |-- utils
 |   |-- config.ts
 |   |-- app.ts
 |   |-- server.ts
