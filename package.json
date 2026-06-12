@@ -1,8 +1,17 @@
 {
   "name": "payment-reception-service",
   "version": "0.0.5",
-  "description": "Test task: payment invoice service",
-  "main": "dist/server.js",
+  "description": "Test task: payment reception service",
+  "author": "Kanstantsin Mazur (incerta)",
+  "keywords": [
+    "express",
+    "mongoose",
+    "zod",
+    "zod-to-openapi",
+    "winston",
+    "ioredis"
+  ],
+  "main": "dist/src/server.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/src/server.js",
@@ -12,7 +21,8 @@
     "test:integration": "jest integration --runInBand",
     "formatter:fix": "prettier --write --log-level silent .",
     "formatter:check": "prettier --check --log-level warn .",
-    "docs:openapi:generate": "tsx scripts/generate-openapi.ts"
+    "docs:openapi:generate": "tsx scripts/generate-openapi.ts",
+    "check": "tsc --noEmit && npm run formatter:check && npm run test:unit && npm run test:integration"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",

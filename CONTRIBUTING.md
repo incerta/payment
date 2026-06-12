@@ -1,39 +1,3 @@
-# Setup, run, test
-
-Prerequisites
-
-```sh
-npm install
-cp .env.example .env
-docker-compose up -d # or configure your own MongoDB and Redis based on env
-```
-
-Run dev server
-
-```sh
-npm run dev
-```
-
-Production build
-
-```bash
-npm run build
-npm start
-```
-
-Test
-
-```sh
-npm run test:unit
-npm run test:integration
-```
-
-Generate OpenAPI spec
-
-```sh
-npm run docs:openapi:generate
-```
-
 # App structure
 
 The app uses strict boundary layering with a single source of truth for HTTP behavior.
@@ -95,6 +59,42 @@ Swagger UI is served at `/docs`, raw OpenAPI JSON at `/openapi.json`.
 |   |-- server.ts
 ```
 
+# Setup, run, test
+
+Prerequisites
+
+```sh
+npm install
+cp .env.example .env
+docker-compose up -d # or configure your own MongoDB and Redis based on env
+```
+
+Run dev server
+
+```sh
+npm run dev
+```
+
+Production build
+
+```bash
+npm run build
+npm start
+```
+
+Test
+
+```sh
+npm run test:unit
+npm run test:integration
+```
+
+Generate OpenAPI spec
+
+```sh
+npm run docs:openapi:generate
+```
+
 ## API version (`/v1`, `/v2`, ...)
 
 Bumped only on a **public contract break** — any change that can cause a compliant client to fail:
@@ -108,7 +108,8 @@ Additive changes (new optional fields, new endpoints) and bug fixes that align i
 
 Non-compliant clients — those coupled to undocumented or incorrect behavior — have no claim on stability. Favoring them is an explicit, documented exception, not a default.
 
-Re-exports from previous versions are allowed, enabling clients to leap-frog from v1 to vN without migrating through every intermediate version. Once a version re-exports from a newer one, its stability guarantees are weakened — this must be documented.
+Re-exports from previous versions are not allowed. New API version release
+not require to have capabilities of the previous API version.
 
 ## Module version (`major.minor.patch`)
 
