@@ -1,3 +1,43 @@
+# 2026-06-12T06:15:34+02:00
+
+[human: @incerta]
+
+- Saved previous README.md content into CONTRIBUTING.md
+
+[zed agent: gpt-5.3-codex]
+
+### What changed
+
+- **Contracts/OpenAPI paths now match required endpoints exactly**
+  - `POST /invoice`
+  - `GET /invoice/{id}`
+  - `POST /webhook`
+  - Files:
+    - `src/api/v1/contracts/invoice/create-invoice.contract.ts`
+    - `src/api/v1/contracts/invoice/get-invoice.contract.ts`
+    - `src/api/v1/contracts/webhook/process-webhook.contract.ts`
+
+- **Webhook contract headers tightened and documented**
+  - `X-Signature` format (`sha256=` optional + 64 hex)
+  - `X-Timestamp` numeric unix seconds
+  - `X-Nonce` non-empty/max length
+  - File: `src/api/v1/contracts/webhook/process-webhook.contract.ts`
+
+- **Removed non-required versioned route aliases**
+  - Removed `/v1/*` mounting; only required task routes remain.
+  - File: `src/loaders/routes.ts`
+
+- **Documentation rewritten to match test-task wording**
+  - Clear sections for `POST /invoice`, `POST /webhook`, `GET /invoice/:id`
+  - Explicit signature/replay/idempotency behavior
+  - Files:
+    - `README.md`
+    - `FOR_REVIEWER.md`
+
+- **Integration coverage aligned with requirement #3 explicitly**
+  - Added dedicated test for `GET /invoice/:id` current status.
+  - File: `integration/api/v1/payment-api.integration.test.ts`
+
 # 2026-06-12T03:48:34+02:00
 
 [zed agent: gpt-5.3-codex]

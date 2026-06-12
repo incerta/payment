@@ -48,7 +48,7 @@ export const registerCreateInvoiceContract = (registry: OpenAPIRegistry): void =
 
   registry.registerPath({
     method: createInvoiceContract.method,
-    path: '/v1/invoice',
+    path: '/invoice',
     operationId: createInvoiceContract.operationId,
     summary: createInvoiceContract.summary,
     tags: ['Invoice'],

@@ -29,7 +29,7 @@ export const registerGetInvoiceContract = (registry: OpenAPIRegistry): void => {
 
   registry.registerPath({
     method: getInvoiceContract.method,
-    path: '/v1/invoice/{id}',
+    path: '/invoice/{id}',
     operationId: getInvoiceContract.operationId,
     summary: getInvoiceContract.summary,
     tags: ['Invoice'],

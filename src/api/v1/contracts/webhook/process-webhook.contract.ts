@@ -11,9 +11,12 @@ import {
 } from '../errors.contract'
 
 const webhookHeadersSchema = z.object({
-  'x-signature': z.string().min(1),
-  'x-timestamp': z.string().min(1),
-  'x-nonce': z.string().min(1),
+  'X-Signature': z
+    .string()
+    .trim()
+    .regex(/^(sha256=)?[A-Fa-f\d]{64}$/),
+  'X-Timestamp': z.string().trim().regex(/^\d+$/),
+  'X-Nonce': z.string().trim().min(1).max(128),
 })
 
 const processWebhookBadRequestErrorResponseSchema = z.union([
@@ -52,14 +55,14 @@ export const registerProcessWebhookContract = (registry: OpenAPIRegistry): void 
 
   registry.registerPath({
     method: processWebhookContract.method,
-    path: '/v1/webhook',
+    path: '/webhook',
     operationId: processWebhookContract.operationId,
     summary: processWebhookContract.summary,
     tags: ['Webhook'],
     request: {
       headers: webhookHeaders,
       body: {
-        description: 'Webhook payload signed by merchant',
+        description: 'Webhook payload signed with HMAC-SHA256(raw request body)',
         required: true,
         content: {
           'application/json': {

@@ -40,6 +40,27 @@ describe('payment API integration', () => {
     expect(typeof response.body.invoiceId).toBe('string')
   })
 
+  test('GET /invoice/:id returns current invoice status', async () => {
+    const createResponse = await request(context.app).post('/invoice').send({
+      amount: '12.34',
+      currency: 'USD',
+      merchantId: TEST_MERCHANT_ID,
+    })
+
+    const response = await request(context.app).get(`/invoice/${createResponse.body.invoiceId}`)
+
+    expect(response.status).toBe(200)
+    expect(response.body).toMatchObject({
+      invoiceId: createResponse.body.invoiceId,
+      status: 'pending',
+      currency: 'USD',
+      amount: '12.34',
+      fee: '0.36',
+      amountToReceive: '11.98',
+      credited: false,
+    })
+  })
+
   test('POST /webhook rejects invalid signature', async () => {
     const invoiceResponse = await request(context.app).post('/invoice').send({
       amount: '10.00',

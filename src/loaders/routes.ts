@@ -39,9 +39,6 @@ export const loadRoutes = (app: Express, deps: RouteLoaderDeps): void => {
     webhookController,
   })
 
-  app.use('/v1', invoiceRoute)
-  app.use('/v1', webhookRoute)
-
   app.use(invoiceRoute)
   app.use(webhookRoute)
 }
