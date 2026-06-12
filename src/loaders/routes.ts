@@ -1,7 +1,10 @@
 import type { Express } from 'express';
-import { createCreateInvoiceController, createGetInvoiceController } from '../api/v1/controllers/invoice/invoice.controller';
+import {
+  createCreateInvoiceController,
+  createGetInvoiceController,
+} from '../api/v1/controllers/invoice/invoice.controller';
 import { createWebhookController } from '../api/v1/controllers/webhook/webhook.controller';
-import { createWebhookAuthMiddleware } from '../api/v1/middleware/webhook-auth/webhook-auth.middleware';
+import { createWebhookAuthMiddleware } from '../middleware/webhook-auth/webhook-auth.middleware';
 import { createInvoiceRoute } from '../api/v1/routes/invoice/invoice.route';
 import { createWebhookRoute } from '../api/v1/routes/webhook/webhook.route';
 import type { InvoiceService } from '../services/invoice/invoice.service';

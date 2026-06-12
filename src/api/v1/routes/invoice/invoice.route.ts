@@ -1,9 +1,8 @@
-import { Router } from 'express';
-import type { ControllerType } from '../../../../core/controller.type';
+import { Router, type RequestHandler } from 'express';
 
 export interface InvoiceRouteControllers {
-  createInvoiceController: ControllerType;
-  getInvoiceController: ControllerType;
+  createInvoiceController: RequestHandler;
+  getInvoiceController: RequestHandler;
 }
 
 export const createInvoiceRoute = ({

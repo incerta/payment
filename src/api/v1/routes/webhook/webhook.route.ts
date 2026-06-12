@@ -1,13 +1,14 @@
-import { Router } from 'express';
-import type { ControllerType } from '../../../../core/controller.type';
-import type { MiddlewareType } from '../../../../core/middleware.type';
+import { Router, type RequestHandler } from 'express';
 
 export interface WebhookRouteDeps {
-  webhookAuthMiddleware: MiddlewareType;
-  webhookController: ControllerType;
+  webhookAuthMiddleware: RequestHandler;
+  webhookController: RequestHandler;
 }
 
-export const createWebhookRoute = ({ webhookAuthMiddleware, webhookController }: WebhookRouteDeps): Router => {
+export const createWebhookRoute = ({
+  webhookAuthMiddleware,
+  webhookController,
+}: WebhookRouteDeps): Router => {
   const router = Router();
 
   router.post('/webhook', webhookAuthMiddleware, webhookController);

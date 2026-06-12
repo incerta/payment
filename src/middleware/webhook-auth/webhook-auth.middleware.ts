@@ -1,7 +1,7 @@
-import type { MiddlewareType } from '../../../../core/middleware.type';
-import { BaseError, MiddlewareError } from '../../../../core/error';
-import { ReplayProtectionService } from '../../../../services/replay-protection/replay-protection.service';
-import { verifyHmacSha256Signature } from '../../../../services/security/hmac.service';
+import type { RequestHandler } from 'express';
+import { BaseError, MiddlewareError } from '../../core/error';
+import { ReplayProtectionService } from '../../services/replay-protection/replay-protection.service';
+import { verifyHmacSha256Signature } from '../../services/security/hmac.service';
 
 export interface WebhookAuthMiddlewareDeps {
   webhookSecret: string;
@@ -11,7 +11,7 @@ export interface WebhookAuthMiddlewareDeps {
 export const createWebhookAuthMiddleware = ({
   webhookSecret,
   replayProtectionService,
-}: WebhookAuthMiddlewareDeps): MiddlewareType => {
+}: WebhookAuthMiddlewareDeps): RequestHandler => {
   return async (req, _res, next) => {
     try {
       const signature = req.header('X-Signature');

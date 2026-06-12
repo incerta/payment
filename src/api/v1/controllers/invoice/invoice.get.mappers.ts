@@ -1,6 +1,6 @@
 import { formatMinorToAmount } from '../../../../utils/money';
 import type { InvoiceModel } from '../../../../models/invoice/invoice.types';
-import type { GetInvoiceResponseDto } from '../../routes/invoice/invoice.types';
+import type { GetInvoiceResponseDto } from '../../dto/invoice/invoice.dto';
 
 export const mapInvoiceToGetResponse = (invoice: InvoiceModel): GetInvoiceResponseDto => {
   return {
